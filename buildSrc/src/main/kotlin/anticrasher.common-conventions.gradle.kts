@@ -12,15 +12,24 @@ version = rootProject.version
 val libs = the<LibrariesForLibs>()
 
 repositories {
+    mavenLocal()
     mavenCentral()
     maven {
         name = "codemc-snapshots"
         url = uri("https://repo.codemc.io/repository/maven-snapshots/")
     }
     maven {
-        name = "finallyADecentReleases"
-        url = uri("https://repo.preva1l.info/releases")
+        // Mirror of multilib/trashcan because repo.preva1l.info is unreliable (Cloudflare 523).
+        name = "loverfella-mirror"
+        url = uri("https://repo.loverfella.com/artifactory/lf-release-local")
+        credentials {
+            username = (project.findProperty("lfArtifactoryUser") as String?) ?: System.getenv("LF_ARTIFACTORY_USER") ?: ""
+            password = (project.findProperty("lfArtifactoryPassword") as String?) ?: System.getenv("LF_ARTIFACTORY_PASSWORD") ?: ""
+        }
     }
+    // finallyADecentReleases (repo.preva1l.info) intentionally removed: it returns
+    // Cloudflare 523, which makes Gradle abort the whole resolve instead of falling
+    // back to other repos. multilib and trashcan are mirrored in loverfella-mirror.
     maven {
         name = "Sonatype Snapshots"
         url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
